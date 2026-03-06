@@ -235,6 +235,36 @@ textarea { resize: vertical; min-height: 85px; }
 .fab:active { transform: scale(0.97); }
 .fab .fab-icon { font-size: 20px; }
 @media(max-width:500px){ .fab { padding: 14px 18px; font-size: 16px; bottom: 16px; right: 16px; } }
+
+/* Parts */
+.part-card { background: var(--cream); border-radius: 10px; padding: 15px 17px; display: grid; grid-template-columns: 1fr auto; gap: 13px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.13); border-left: 5px solid var(--green-bright); margin-bottom: 8px; }
+.part-card.low { border-left-color: var(--red); }
+.part-card.warn { border-left-color: var(--amber); }
+.part-name { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+.part-meta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+.part-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; min-width: 100px; }
+.part-qty { font-family: 'Bebas Neue', sans-serif; font-size: 32px; line-height: 1; color: var(--green-mid); }
+.part-card.low .part-qty { color: var(--red); }
+.part-card.warn .part-qty { color: #b07a00; }
+.part-unit { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); text-align: right; }
+.part-btns { display: flex; gap: 5px; }
+.part-btn { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; transition: all 0.2s; }
+.part-btn.use { background: #fde8e6; color: var(--red); }
+.part-btn.use:hover { background: var(--red); color: #fff; }
+.part-btn.add { background: var(--green-pale); color: var(--green-mid); }
+.part-btn.add:hover { background: var(--green-bright); color: #fff; }
+/* Labor */
+.labor-tech-card { background: var(--cream); border-radius: 10px; padding: 16px 18px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.13); }
+.labor-tech-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.labor-tech-name { font-size: 15px; font-weight: 600; color: var(--ink); }
+.labor-tech-farm { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 2px; }
+.labor-total { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--green-mid); line-height: 1; }
+.labor-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.labor-bar-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); width: 80px; flex-shrink: 0; }
+.labor-bar { height: 10px; background: var(--border); border-radius: 5px; flex: 1; overflow: hidden; }
+.labor-bar-fill { height: 100%; background: var(--green-bright); border-radius: 5px; transition: width 0.4s; }
+.labor-bar-hrs { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); width: 40px; text-align: right; flex-shrink: 0; }
+.farm-section-hdr { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #fff; letter-spacing: 2px; margin: 18px 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--green-mid); }
 </style>
 </head>
 <body>
@@ -261,6 +291,8 @@ textarea { resize: vertical; min-height: 85px; }
       <button class="nav-tab" id="tab-wo" onclick="go('wo')">🔧 Work Orders</button>
       <button class="nav-tab" id="tab-pm" onclick="go('pm')">📋 PM Schedule</button>
       <button class="nav-tab" id="tab-sw" onclick="go('sw')">✅ Daily Rounds</button>
+      <button class="nav-tab" id="tab-parts" onclick="go('parts')">🔩 Parts</button>
+      <button class="nav-tab" id="tab-labor" onclick="go('labor')">⏱ Labor</button>
       <button class="nav-tab" id="tab-log" onclick="go('log')">📁 Log</button>
     </nav>
   </div>
@@ -526,6 +558,41 @@ textarea { resize: vertical; min-height: 85px; }
 
 </div>
 
+
+<!-- PARTS & INVENTORY -->
+<div class="panel" id="panel-parts">
+  <div class="section-title">Parts & Inventory</div>
+  <div class="section-sub">Track stock levels — red means reorder now</div>
+  <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+    <button class="btn-new" onclick="showAddPart()" style="padding:11px 20px;font-size:12px;">➕ Add New Part</button>
+    <button class="btn-new" onclick="showReceiveStock()" style="padding:11px 20px;font-size:12px;background:var(--green-mid);">📦 Receive Stock</button>
+  </div>
+  <div class="stats-grid g4" id="parts-stats"></div>
+  <div class="pill-bar">
+    <button class="pill active" onclick="partsFilter('all',this)">All Parts</button>
+    <button class="pill" onclick="partsFilter('low',this)">🔴 Low Stock</button>
+    <button class="pill" onclick="partsFilter('ok',this)">✅ OK</button>
+    <button class="pill" onclick="partsFilter('Ventilation',this)">💨 Ventilation</button>
+    <button class="pill" onclick="partsFilter('Water',this)">💧 Water</button>
+    <button class="pill" onclick="partsFilter('Feed',this)">🌾 Feed</button>
+    <button class="pill" onclick="partsFilter('Electrical',this)">⚡ Electrical</button>
+    <button class="pill" onclick="partsFilter('General',this)">🔧 General</button>
+  </div>
+  <div id="parts-list"></div>
+</div>
+
+<!-- LABOR DASHBOARD -->
+<div class="panel" id="panel-labor">
+  <div class="section-title">Labor Hours</div>
+  <div class="section-sub">Weekly breakdown by tech and farm — pulled from Daily Rounds timers</div>
+  <div class="pill-bar" id="labor-week-bar">
+    <button class="loc-pill active" onclick="laborWeek('this',this)">This Week</button>
+    <button class="loc-pill" onclick="laborWeek('last',this)">Last Week</button>
+    <button class="loc-pill" onclick="laborWeek('month',this)">This Month</button>
+  </div>
+  <div class="stats-grid g4" id="labor-stats"></div>
+  <div id="labor-farm-breakdown"></div>
+</div>
 <!-- LOG -->
 <div class="panel" id="panel-log">
   <div class="section-title">Activity Log</div>
@@ -712,6 +779,8 @@ async function initApp() {
 
     setMsg('Loading daily rounds...');
     await loadSWRounds();
+    setMsg('Loading parts inventory...');
+    await loadParts();
     setMsg('Loading activity log...');
     // Load log
     const logSnap = await getDocs(query(collection(db,'activityLog'), orderBy('ts','desc')));
@@ -772,8 +841,8 @@ window.go = function(tab) {
   }
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  const pm = {dash:'panel-dash', wo:'panel-wo', pm:'panel-pm', sw:'panel-sw', log:'panel-log'};
-  const tm = {dash:'tab-dash',   wo:'tab-wo',   pm:'tab-pm',   sw:'tab-sw',   log:'tab-log'};
+  const pm = {dash:'panel-dash', wo:'panel-wo', pm:'panel-pm', sw:'panel-sw', parts:'panel-parts', labor:'panel-labor', log:'panel-log'};
+  const tm = {dash:'tab-dash',   wo:'tab-wo',   pm:'tab-pm',   sw:'tab-sw',   parts:'tab-parts', labor:'tab-labor', log:'tab-log'};
   document.getElementById(pm[tab]).classList.add('active');
   document.getElementById(tm[tab]).classList.add('active');
   if (tab === 'wo') {
@@ -783,8 +852,10 @@ window.go = function(tab) {
   }
   if (tab === 'dash') renderDash();
   if (tab === 'pm')   renderPM();
-  if (tab === 'sw')   renderSW();
-  if (tab === 'log')  renderLog();
+  if (tab === 'sw')     renderSW();
+  if (tab === 'parts')  renderParts();
+  if (tab === 'labor')  renderLabor();
+  if (tab === 'log')    renderLog();
 }
 
 // ── DATE UTILS ──
@@ -855,6 +926,23 @@ function renderDash() {
     : '<div class="empty"><div class="ei">✅</div><p>No urgent open work orders</p></div>';
 
   const overdue = ALL_PM.filter(t=>pmStatus(t.id)==='overdue').slice(0,6);
+  // Low parts alert on dashboard
+  const lowParts = Object.values(partsData).filter(p=>p.qty <= p.minQty);
+  const lowPartsHtml = lowParts.length
+    ? lowParts.map(p=>`<div class="log-card" style="border-left-color:var(--red)"><div class="log-body"><h4>🔩 ${p.name}</h4><p>Only ${p.qty} ${p.unit} left — minimum is ${p.minQty}</p></div><div class="log-meta" style="color:var(--red);font-weight:700">REORDER</div></div>`).join('')
+    : '<div class="empty"><div class="ei">✅</div><p>All parts stocked</p></div>';
+
+  // Add low parts section to dash if not already there
+  let lpSection = document.getElementById('dash-low-parts');
+  if (!lpSection) {
+    const dpSection = document.getElementById('dash-overdue-pm').parentElement || document.getElementById('panel-dash');
+    const newDiv = document.createElement('div');
+    newDiv.innerHTML = '<div class="recent-hdr">🔩 Low Stock Parts</div><div class="card-list" id="dash-low-parts"></div>';
+    document.getElementById('panel-dash').appendChild(newDiv);
+  }
+  const lp = document.getElementById('dash-low-parts');
+  if (lp) lp.innerHTML = lowPartsHtml;
+
   document.getElementById('dash-overdue-pm').innerHTML = overdue.length
     ? overdue.map(t=>pmCardHtml(t)).join('')
     : '<div class="empty"><div class="ei">✅</div><p>No overdue PM tasks</p></div>';
@@ -1500,6 +1588,258 @@ window.swTechChanged = function() {
     houseEl.innerHTML = '<option value="">— Select —</option>';
   }
   loadChecklist();
+}
+
+
+// ══════════════════════════════════════════
+// PARTS & INVENTORY
+// ══════════════════════════════════════════
+
+const DEFAULT_PARTS = [
+  {id:'p1', name:'Fan Belt 5/8"', category:'Ventilation', qty:12, minQty:4, unit:'each', location:'Shop'},
+  {id:'p2', name:'Fan Belt 3/4"', category:'Ventilation', qty:8, minQty:4, unit:'each', location:'Shop'},
+  {id:'p3', name:'Fan Motor Bearing', category:'Ventilation', qty:6, minQty:2, unit:'each', location:'Shop'},
+  {id:'p4', name:'Ventilation Controller Fuse', category:'Ventilation', qty:10, minQty:5, unit:'each', location:'Shop'},
+  {id:'p5', name:'Nipple Drinker', category:'Water', qty:50, minQty:20, unit:'each', location:'Shop'},
+  {id:'p6', name:'Water Line Clamp 1/2"', category:'Water', qty:30, minQty:10, unit:'each', location:'Shop'},
+  {id:'p7', name:'Sediment Filter Cartridge', category:'Water', qty:6, minQty:3, unit:'each', location:'Well House'},
+  {id:'p8', name:'Pump Pressure Switch', category:'Water', qty:2, minQty:1, unit:'each', location:'Well House'},
+  {id:'p9', name:'Auger Drive Chain', category:'Feed', qty:3, minQty:1, unit:'each', location:'Shop'},
+  {id:'p10', name:'Feed Auger Bearing', category:'Feed', qty:4, minQty:2, unit:'each', location:'Shop'},
+  {id:'p11', name:'Feed Pan (replacement)', category:'Feed', qty:10, minQty:5, unit:'each', location:'Shop'},
+  {id:'p12', name:'Circuit Breaker 20A', category:'Electrical', qty:5, minQty:2, unit:'each', location:'Shop'},
+  {id:'p13', name:'Circuit Breaker 30A', category:'Electrical', qty:3, minQty:1, unit:'each', location:'Shop'},
+  {id:'p14', name:'Wire Nuts (bag)', category:'Electrical', qty:4, minQty:2, unit:'bag', location:'Shop'},
+  {id:'p15', name:'Bearing Grease (tube)', category:'General', qty:6, minQty:2, unit:'tube', location:'Shop'},
+  {id:'p16', name:'Zip Ties (bag)', category:'General', qty:8, minQty:3, unit:'bag', location:'Shop'},
+  {id:'p17', name:'Litter Treatment (bag)', category:'General', qty:10, minQty:4, unit:'bag', location:'Hegins'},
+  {id:'p18', name:'Propane Ignitor', category:'General', qty:3, minQty:1, unit:'each', location:'Shop'},
+];
+
+let partsData = {};
+let partsFilter_val = 'all';
+let modalPartId = null;
+let modalPartAction = null;
+
+async function loadParts() {
+  try {
+    const snap = await getDocs(collection(db,'parts'));
+    partsData = {};
+    snap.forEach(d => { partsData[d.id] = d.data(); });
+    // Seed defaults if empty
+    if (Object.keys(partsData).length === 0) {
+      for (const p of DEFAULT_PARTS) {
+        await setDoc(doc(db,'parts',p.id), p);
+        partsData[p.id] = p;
+      }
+    }
+  } catch(e) { console.log('Parts load err:', e); }
+}
+
+window.partsFilter = function(v, btn) {
+  partsFilter_val = v;
+  document.querySelectorAll('#panel-parts .pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderParts();
+}
+
+function renderParts() {
+  loadParts().then(() => {
+    let parts = Object.values(partsData);
+    if (partsFilter_val === 'low') parts = parts.filter(p=>p.qty <= p.minQty);
+    else if (partsFilter_val === 'ok') parts = parts.filter(p=>p.qty > p.minQty);
+    else if (partsFilter_val !== 'all') parts = parts.filter(p=>p.category === partsFilter_val);
+
+    parts.sort((a,b) => {
+      const aLow = a.qty <= a.minQty; const bLow = b.qty <= b.minQty;
+      if (aLow && !bLow) return -1; if (!aLow && bLow) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    const all = Object.values(partsData);
+    const lowCount = all.filter(p=>p.qty <= p.minQty).length;
+    const warnCount = all.filter(p=>p.qty > p.minQty && p.qty <= p.minQty * 1.5).length;
+    const okCount = all.filter(p=>p.qty > p.minQty * 1.5).length;
+
+    document.getElementById('parts-stats').innerHTML =
+      sc('s-red', lowCount, '🔴 Low / Out') +
+      sc('s-amber', warnCount, '🟡 Running Low') +
+      sc('s-green', okCount, '✅ Well Stocked') +
+      sc('', all.length, 'Total Parts');
+
+    if (!parts.length) {
+      document.getElementById('parts-list').innerHTML = '<div class="empty"><div class="ei">📦</div><p>No parts match this filter.</p></div>';
+      return;
+    }
+
+    document.getElementById('parts-list').innerHTML = parts.map(p => {
+      const isLow = p.qty <= p.minQty;
+      const isWarn = p.qty > p.minQty && p.qty <= p.minQty * 1.5;
+      const cls = isLow ? 'low' : isWarn ? 'warn' : '';
+      return `<div class="part-card ${cls}">
+        <div>
+          <div class="part-name">${p.name}</div>
+          <div class="part-meta">${p.category} · 📍 ${p.location} · Min: ${p.minQty} ${p.unit}</div>
+          ${isLow ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--red);margin-top:3px;font-weight:600;">⚠️ REORDER NOW</div>` : ''}
+        </div>
+        <div class="part-right">
+          <div class="part-qty">${p.qty}</div>
+          <div class="part-unit">${p.unit}</div>
+          <div class="part-btns">
+            <button class="part-btn use" onclick="adjustPart('${p.id}','use')">− Use</button>
+            <button class="part-btn add" onclick="adjustPart('${p.id}','receive')">+ Add</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  });
+}
+
+window.adjustPart = function(id, action) {
+  modalPartId = id;
+  modalPartAction = action;
+  const p = partsData[id];
+  const qty = action === 'use'
+    ? prompt(`How many "${p.name}" used? (Current: ${p.qty})`, '1')
+    : prompt(`How many "${p.name}" received? (Current: ${p.qty})`, '1');
+  if (qty === null) return;
+  const n = parseInt(qty);
+  if (isNaN(n) || n <= 0) return alert('Please enter a valid number.');
+  const newQty = action === 'use' ? Math.max(0, p.qty - n) : p.qty + n;
+  setSyncDot('saving');
+  setDoc(doc(db,'parts',id), {...p, qty: newQty}).then(() => {
+    partsData[id].qty = newQty;
+    addDoc(collection(db,'activityLog'), {
+      type:'parts', id,
+      desc:`Parts ${action === 'use' ? 'used' : 'received'}: ${n}x ${p.name} (now: ${newQty})`,
+      tech:'—', date:new Date().toLocaleDateString(), ts:Date.now()
+    });
+    setSyncDot('live');
+    renderParts();
+    // Update dashboard if low
+    renderDash();
+  });
+}
+
+window.showAddPart = function() {
+  const name = prompt('Part name:');
+  if (!name) return;
+  const cat = prompt('Category (Ventilation / Water / Feed / Electrical / General):') || 'General';
+  const qty = parseInt(prompt('Current quantity:', '0')) || 0;
+  const min = parseInt(prompt('Minimum stock level (reorder point):', '2')) || 2;
+  const unit = prompt('Unit (each / bag / tube / box):', 'each') || 'each';
+  const loc = prompt('Storage location:', 'Shop') || 'Shop';
+  const id = 'p' + Date.now();
+  const part = {id, name, category:cat, qty, minQty:min, unit, location:loc};
+  setSyncDot('saving');
+  setDoc(doc(db,'parts',id), part).then(() => {
+    partsData[id] = part;
+    setSyncDot('live');
+    renderParts();
+  });
+}
+
+window.showReceiveStock = function() {
+  alert('Use the "+ Add" button on any part to receive stock.');
+}
+
+// ══════════════════════════════════════════
+// LABOR HOURS DASHBOARD
+// ══════════════════════════════════════════
+
+let laborPeriod = 'this';
+
+const TECH_FARM_LABOR = {
+  Adam:'Hegins', Nathan:'Hegins', Carlos:'Hegins', Randy:'Hegins',
+  Josh:'Danville', Cain:'Danville', Celia:'Danville', Deb:'Danville',
+  Steve:'All Sites'
+};
+
+function getWeekRange(period) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const day = now.getDay();
+  if (period === 'this') {
+    const start = new Date(now); start.setDate(now.getDate() - day);
+    const end = new Date(start); end.setDate(start.getDate() + 6);
+    return {start, end};
+  } else if (period === 'last') {
+    const start = new Date(now); start.setDate(now.getDate() - day - 7);
+    const end = new Date(start); end.setDate(start.getDate() + 6);
+    return {start, end};
+  } else {
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth()+1, 0);
+    return {start, end};
+  }
+}
+
+function dateInRange(dateStr, start, end) {
+  const d = new Date(dateStr); d.setHours(0,0,0,0);
+  return d >= start && d <= end;
+}
+
+window.laborWeek = function(period, btn) {
+  laborPeriod = period;
+  document.querySelectorAll('#labor-week-bar .loc-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLabor();
+}
+
+function renderLabor() {
+  const {start, end} = getWeekRange(laborPeriod);
+  // Get rounds in range
+  const rounds = Object.values(swRounds).filter(r => r.date && dateInRange(r.date, start, end));
+
+  // Aggregate hours per tech
+  const techHours = {};
+  for (const round of rounds) {
+    if (!round.tasks) continue;
+    const hrs = Object.values(round.tasks).reduce((s,t)=>s+(t.actualHrs||0),0);
+    if (!techHours[round.tech]) techHours[round.tech] = {total:0, rounds:0};
+    techHours[round.tech].total += hrs;
+    techHours[round.tech].rounds++;
+  }
+
+  const allTechs = Object.keys(TECH_FARM_LABOR);
+  const totalHrs = Object.values(techHours).reduce((s,t)=>s+t.total,0);
+  const maxHrs = Math.max(...Object.values(techHours).map(t=>t.total), 1);
+  const activeTechs = Object.keys(techHours).length;
+
+  const rangeLabel = period === 'this' ? 'This Week' : period === 'last' ? 'Last Week' : 'This Month';
+
+  document.getElementById('labor-stats').innerHTML =
+    sc('s-blue', totalHrs.toFixed(1), 'Total Hours') +
+    sc('s-green', activeTechs, 'Active Techs') +
+    sc('', rounds.length, 'Rounds Logged') +
+    sc('s-amber', totalHrs > 0 ? (totalHrs/Math.max(activeTechs,1)).toFixed(1) : 0, 'Avg Hrs/Tech');
+
+  let html = '';
+  for (const farm of ['Hegins','Danville','All Sites']) {
+    const farmTechs = allTechs.filter(t => TECH_FARM_LABOR[t] === farm);
+    if (!farmTechs.length) continue;
+    html += `<div class="farm-section-hdr">📍 ${farm}</div>`;
+    for (const tech of farmTechs) {
+      const data = techHours[tech] || {total:0, rounds:0};
+      const pct = Math.round((data.total / maxHrs) * 100);
+      html += `<div class="labor-tech-card">
+        <div class="labor-tech-hdr">
+          <div>
+            <div class="labor-tech-name">👤 ${tech}</div>
+            <div class="labor-tech-farm">${farm} · ${data.rounds} round${data.rounds!==1?'s':''} logged</div>
+          </div>
+          <div class="labor-total">${data.total.toFixed(1)}<span style="font-size:14px;color:var(--muted);font-family:'IBM Plex Sans',sans-serif"> hrs</span></div>
+        </div>
+        <div class="labor-bar-row">
+          <div class="labor-bar-label">${rangeLabel}</div>
+          <div class="labor-bar"><div class="labor-bar-fill" style="width:${pct}%"></div></div>
+          <div class="labor-bar-hrs">${data.total.toFixed(1)}h</div>
+        </div>
+      </div>`;
+    }
+  }
+
+  if (!html) html = '<div class="empty"><div class="ei">⏱</div><p>No hours logged yet for this period.<br>Hours come from Daily Rounds timers.</p></div>';
+  document.getElementById('labor-farm-breakdown').innerHTML = html;
 }
 
 // ── BOOT ──
